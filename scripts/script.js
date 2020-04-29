@@ -1,9 +1,5 @@
 var canvas = document.getElementById("canvas");
 
-// Set initial conditions.
-var t = 0;
-var x = 0.02;
-
 // Set initial step size.
 var dt = 1e-1;
 
@@ -26,7 +22,6 @@ function rk4(y, x, dx, f) {
 		k4 = dx * f(x + dx, y + k3);
 	return y + (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0;
 }
-
 function adaptive_rk4(y, x, dx, f) {
 	//regular runge kutta step
 	var step = rk4(y, x, dx, f);
@@ -57,17 +52,15 @@ function adaptive_rk4(y, x, dx, f) {
 }
 
 function getGravAcc(pos, p1) {
-	// NOTE: P1 is the planet being accelerated, P2 is exerting the force
+	// NOTE: P1 is the planet being accelerated, ignores itself
 	resultVector = new Vector();
-
-	for (var p2 of planets) {
+	for (var p2 of planets)
 		if (p2 != p1) {
 			r = pos.subtract(p2.p);
 			resultVector = resultVector.add(
 				r.unit().multiply((G * p2.m) / r.length2)
 			);
 		}
-	}
 	return resultVector;
 }
 

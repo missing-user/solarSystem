@@ -5,17 +5,18 @@ var t = 0;
 var x = 0.02;
 
 // Set initial step size.
-var dt = 1e-2;
+var dt = 1e-1;
 
 // Set minimal step size.
-var dx_min = 1e-2;
-var dx_max = 1e2;
+var dx_min = 1e-3;
+var dx_max = 1e-1;
 
 // Set relative change tolerances.
-var x_tol = 1e-4;
+var x_tol = 2e-2;
 
 //constants
-const G = -6.67408e-11;
+//const G = -6.67408e-11;
+const G = -6.67408e-3;
 
 function rk4(y, x, dx, f) {
 	var k1 = dx * f(x, y),
@@ -104,64 +105,72 @@ function adaptive_rk4_v2(p1, p2, dx) {
 
 	if (half_step.new_v.subtract(step.new_v).length2 > x_tol) {
 		dt = dx / 2;
-		/*console.log(
+		console.log(
 			"step halved",
 			dt,
 			"cause the dif was",
 			half_step.new_v.length2 - step.new_v.length2
-		);*/
+		);
 		if (dt < dx_min) dt = dx_min;
 	}
 	if (double_step.new_v.subtract(step.new_v).length2 < x_tol) {
 		dt = dx * 2;
-		/*console.log(
+		console.log(
 			"step doubled",
 			dt,
 			"cause the dif was",
 			double_step.new_v.subtract(step.new_v).length2
-		);*/
+		);
 		if (dt > dx_max) dt = dx_max;
 	}
 	return step;
 }
 var ctx = canvas.getContext("2d");
-ctx.translate(500, 500);
-var sun = new Planet();
-sun.m = 1.989e30;
-
+var sun = new Planet(new Vector(100, 100, 0));
+//sun.m = 1.989e30;
+sun.m = 1.989e5;
 var earth = new Planet(
 	new Vector(-1.192693180463659e8, -9.196938727630605e7, 4.536886832430959e3),
 	new Vector(1.771605681005595e1, -2.370187334742887e1, -3.939447511491778e-5),
 	5.97219e24
 );
+earth = new Planet(new Vector(200, 200, 0), new Vector(-3, 0, 0), 100);
 var mars = new Planet(
 	new Vector(2.240677809234498e7, -2.146888173319176e8, -5.048212889226571e6),
 	new Vector(2.501421553891083e1, 4.59861352288849, -5.173266156648491e-1),
 	6.4171e23
 );
+mars = new Planet(new Vector(150, 100, 0), new Vector(4, 5, 0), 2e2);
 setInterval(function() {
 	ctx.beginPath();
-	ctx.arc(earth.p.x / 1e6, earth.p.y / 1e6, 5, 0, Math.PI * 2, false);
-	ctx.fillStyle = "red";
-	ctx.fill();
-	ctx.stroke();
-
-	ctx.beginPath();
-	ctx.arc(mars.p.x / 1e6, mars.p.y / 1e6, 5, 0, Math.PI * 2, false);
+	ctx.arc(earth.p.x, earth.p.y, 5, 0, Math.PI * 2, false);
 	ctx.fillStyle = "blue";
 	ctx.fill();
 	ctx.stroke();
 
 	ctx.beginPath();
-	ctx.arc(sun.p.x / 1e6, sun.p.y / 1e6, 10, 0, Math.PI * 2, false);
-	ctx.fillStyle = "yellow";
+	ctx.arc(mars.p.x, mars.p.y, 5, 0, Math.PI * 2, false);
+	ctx.fillStyle = "red";
 	ctx.fill();
 	ctx.stroke();
 
-	res = adaptive_rk4_v2(mars, sun, dt);
-	mars.p = mars.p.add(res.new_p.multiply(dt));
-	mars.v = mars.v.add(res.new_v.multiply(dt));
-	res = adaptive_rk4_v2(earth, sun, dt);
-	earth.p = earth.p.add(res.new_p.multiply(dt));
-	earth.v = earth.v.add(res.new_v.multiply(dt));
+	ctx.beginPath();
+	ctx.arc(sun.p.x, sun.p.y, 10, 0, Math.PI * 2, false);
+	ctx.fillStyle = "yellow";
+	ctx.fill();
+	ctx.stroke();
+	for (var i = 0; i < 20; i++) {
+		res = adaptive_rk4_v2(mars, sun, dt);
+		mars.p = mars.p.add(res.new_p.multiply(dt));
+		mars.v = mars.v.add(res.new_v.multiply(dt));
+		res = rk4_v2(earth, sun, dt);
+		earth.p = earth.p.add(res.new_p.multiply(dt));
+		earth.v = earth.v.add(res.new_v.multiply(dt));
+		res = rk4_v2(sun, mars, dt);
+		sun.p = sun.p.add(res.new_p.multiply(dt));
+		sun.v = sun.v.add(res.new_v.multiply(dt));
+		res = rk4_v2(sun, earth, dt);
+		sun.p = sun.p.add(res.new_p.multiply(dt));
+		sun.v = sun.v.add(res.new_v.multiply(dt));
+	}
 }, 1);

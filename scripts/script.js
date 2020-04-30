@@ -1,14 +1,16 @@
-var canvas = document.getElementById("canvas");
+var canvas = document.getElementById("canvas"),
+	ctx = canvas.getContext("2d");
 
 // Set initial step size.
-var dt = 1e-1;
+var dt = 1e-1,
+	adjusted_dt = [];
 
 // Set minimal step size.
-var dx_min = 5e-3;
+var dx_min = 2e-2;
 var dx_max = 5e-1;
 
 // Set relative change tolerances.
-var x_tol = 3e-2;
+var x_tol = 5e-2;
 
 //constants
 //const G = -6.67408e-11;
@@ -98,36 +100,35 @@ function adaptive_rk4_v2(p1, dx) {
 	var step = rk4_v2(p1, dx);
 	//half runge kutta step
 	var half_step = rk4_v2(p1, dx * 0.5);
-	half_step.new_p = half_step.new_p.multiply(2);
 	half_step.new_v = half_step.new_v.multiply(2);
 	//double runge kutta step
 	var double_step = rk4_v2(p1, dx * 2);
-	double_step.new_p = double_step.new_p.multiply(0.5);
 	double_step.new_v = double_step.new_v.multiply(0.5);
 
-	if (half_step.new_v.subtract(step.new_v).length2 > x_tol) {
-		dt = dx / 2;
-		/*console.log(
-			"step halved",
-			dt,
-			"cause the dif was",
-			half_step.new_v.length2 - step.new_v.length2
-		);*/
-		if (dt < dx_min) dt = dx_min;
-	}
-	if (double_step.new_v.subtract(step.new_v).length2 < x_tol) {
-		dt = dx * 2;
-		/*	console.log(
-			"step doubled",
-			dt,
-			"cause the dif was",
-			double_step.new_v.subtract(step.new_v).length2
-		);*/
-		if (dt > dx_max) dt = dx_max;
-	}
-	return step;
+	if (half_step.new_v.subtract(step.new_v).length2 > x_tol)
+		adjusted_dt.push(dx * 0.5);
+	else if (double_step.new_v.subtract(step.new_v).length2 < x_tol)
+		adjusted_dt.push(dx * 2);
+	else adjusted_dt.push(dx);
+
+	//set the planets position and velocity
+	p1.p = p1.p.add(step.new_p.multiply(dx));
+	p1.v = p1.v.add(step.new_v.multiply(dx));
 }
-var ctx = canvas.getContext("2d");
+
+function adjustTimestep() {
+	//find the minimal time in the array
+	dt = adjusted_dt[0];
+	for (var new_dt of adjusted_dt) {
+		if (new_dt < dt) dt = new_dt;
+	}
+	adjusted_dt = []; //clear the array
+
+	//check that the new timestep is within allowed bounds
+	if (dt > dx_max) dt = dx_max;
+	if (dt < dx_min) dt = dx_min;
+}
+
 var sun = new Planet(new Vector(300, 300, 0));
 //sun.m = 1.989e30;
 sun.m = 1.989e5;
@@ -136,64 +137,46 @@ var earth = new Planet(
 	new Vector(1.771605681005595e1, -2.370187334742887e1, -3.939447511491778e-5),
 	5.97219e24
 );
-earth = new Planet(new Vector(200, 200, 0), new Vector(3, 0, 0), 1);
+earth = new Planet(new Vector(200, 200, 1), new Vector(3, 0, 0), 1e3);
 var mars = new Planet(
 	new Vector(2.240677809234498e7, -2.146888173319176e8, -5.048212889226571e6),
 	new Vector(2.501421553891083e1, 4.59861352288849, -5.173266156648491e-1),
 	6.4171e23
 );
-mars = new Planet(new Vector(350, 300, 0), new Vector(4, 5, 0), 2e2);
+mars = new Planet(new Vector(350, 300, 2), new Vector(4, 5, 0), 2e2);
+var venus = new Planet(new Vector(200, 400, 0), new Vector(0, -3.5, 0), 2e1);
 planets.push(mars);
+planets.push(venus);
 planets.push(sun);
 planets.push(earth);
 
 setInterval(function() {
+	//ctx.fillStyle = "rgba(0,0,0,0.05)";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.beginPath();
-	ctx.arc(earth.p.x, earth.p.y, 5, 0, Math.PI * 2, false);
-	ctx.fillStyle = "blue";
-	ctx.fill();
-	ctx.stroke();
-
-	ctx.beginPath();
-	ctx.arc(mars.p.x, mars.p.y, 5, 0, Math.PI * 2, false);
-	ctx.fillStyle = "red";
-	ctx.fill();
-	ctx.stroke();
-
-	ctx.beginPath();
-	ctx.arc(sun.p.x, sun.p.y, 10, 0, Math.PI * 2, false);
-	ctx.fillStyle = "yellow";
-	ctx.fill();
-	ctx.stroke();
-	for (var i = 0; i < 200; i++) {
+	for (var i = 0; i < 20; i++) {
 		// NOTE: the step size has to stay the same for the entire calculation
-		res = adaptive_rk4_v2(earth, dt);
-		earth.p = earth.p.add(res.new_p.multiply(dt));
-		earth.v = earth.v.add(res.new_v.multiply(dt));
-		res = rk4_v2(mars, dt);
-		mars.p = mars.p.add(res.new_p.multiply(dt));
-		mars.v = mars.v.add(res.new_v.multiply(dt));
-		res = rk4_v2(sun, dt);
-		sun.p = sun.p.add(res.new_p.multiply(dt));
-		sun.v = sun.v.add(res.new_v.multiply(dt));
+		for (var p of planets) adaptive_rk4_v2(p, dt);
 
-		ctx.beginPath();
-		ctx.arc(earth.p.x, earth.p.y, 5, 0, Math.PI * 2, false);
-		ctx.fillStyle = "blue";
-		ctx.fill();
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.arc(mars.p.x, mars.p.y, 5, 0, Math.PI * 2, false);
-		ctx.fillStyle = "red";
-		ctx.fill();
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.arc(sun.p.x, sun.p.y, 10, 0, Math.PI * 2, false);
-		ctx.fillStyle = "yellow";
-		ctx.fill();
-		ctx.stroke();
+		drawPlanet(sun, 150, "yellow");
+		drawPlanet(mars, 70, "red");
+		drawPlanet(earth, 50, "blue");
+		drawPlanet(venus, 30, "green");
+		adjustTimestep();
 	}
-}, 10);
+}, 16);
+
+function drawPlanet(p, radius, color) {
+	ctx.beginPath();
+	ctx.arc(
+		p.p.x,
+		p.p.y,
+		radius * (10 / Math.max(0.01, p.p.z + 100)),
+		0,
+		Math.PI * 2,
+		false
+	);
+	ctx.fillStyle = color;
+	ctx.fill();
+	ctx.stroke();
+}

@@ -19,7 +19,11 @@
         <div class="column" style="margin-top: 25%">
           <h4>Solar System simulation</h4>
           <p>It keeps slowing down and speeding up because I'm adjusting the simulation timestep dynamically, depending on how much accuracy is required. The solver is a
-            <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">Runge Kutta fourth order implementation.</a>
+            <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">Runge Kutta fourth order implementation</a>
+            (with custom adaptive timesteps)
+            <br>
+            The size of the planets depends on their Z position (how close they are to the camera), because the entire simulation is running in 3D but I didn't habe the time to make a proper 3D display yet. :D
+
           </p>
         </div>
       </div>

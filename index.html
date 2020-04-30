@@ -16,7 +16,7 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="column" style="margin-top: 25%">
+        <div class="column" style="margin-top: 5rem">
           <h4>Solar System simulation</h4>
           <p>It keeps slowing down and speeding up because I'm adjusting the simulation timestep dynamically, depending on how much accuracy is required. The solver is a
             <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">Runge Kutta fourth order implementation</a>
@@ -31,6 +31,19 @@
       <div class="row">
         <div class="column">
           <canvas class="u-full-width" id="canvas" width="1000" height="1000"></canvas>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="one-half column">
+          <input type="range" value="50" min="1" max="10000" step="any" oninput="document.getElementById('chargeIntensityo').value = this.value; origin.planet_scale = this.value" id="chargeIntensity">
+          <label for="chargeIntensity">planet scale</label>
+          <output id="chargeIntensityo" class="u-pull-right">1</output>
+        </div>
+        <div class="one-half column">
+          <input type="range" value="1.3889477023997076e-10" min="1.3889477023997076e-10" max="1e-8" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; origin.scale = this.value" id="pixelsPerCell">
+          <label for="pixelsPerCell">zoom</label>
+          <output id="pixelsPerCello" class="u-pull-right">10</output>
         </div>
       </div>
 

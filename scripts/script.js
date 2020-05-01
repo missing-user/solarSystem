@@ -20,7 +20,17 @@ var origin = {
 	y: 0,
 	planet_scale: 500
 };
-var selected = {};
+var selected = {},
+	maincolor = "#333";
+//set the colorscheme
+if (window.matchMedia) {
+	window.matchMedia("(prefers-color-scheme: dark)").addListener(e => {
+		maincolor = e.matches ? "#d3d7cf" : "#333";
+		console.log("theme change detected, setting color to", maincolor);
+	});
+	if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+		maincolor = "#d3d7cf";
+}
 
 function getGravAcc(pos, p1) {
 	// NOTE: P1 is the planet being accelerated, ignores itself
@@ -94,9 +104,8 @@ function adjustTimestep() {
 }
 var sun = new Planet();
 sun.m = 1.989e30;
-sun.r = 19911000;
+sun.r = 696340000;
 sun.alt_r = 25;
-//sun.r = 696340000;
 sun.color = "yellow";
 sun.name = "sun";
 planets.push(sun);
@@ -226,8 +235,8 @@ setInterval(function() {
 		drawPlanet(p, p.r, p.color);
 	}
 
-	ctx.fillStyle = "#fff";
-	ctx.font = "18px sans-serif";
+	ctx.fillStyle = maincolor;
+	ctx.font = "16px sans-serif";
 	if (selected.name) {
 		ctx.fillText(selected.name + "", 10, 20);
 		ctx.fillText(selected.m + " kg", 10, 40);

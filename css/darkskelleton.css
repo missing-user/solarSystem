@@ -5,10 +5,12 @@ body {
   color: #d3d7cf;
   background: #2e3436;
 }
+
 /* Links */
 a {
   color: #729fcf;
 }
+
 a:hover {
   color: #eeeeec;
 }
@@ -63,12 +65,14 @@ input[type="button"].button-primary:focus {
 }
 
 /* input range */
-input[type="range"]  {
+input[type="range"] {
   background-color: #babdb6;
 }
+
 input[type="range"]::-webkit-slider-thumb {
   background-color: #d3d7cf;
 }
+
 input[type=range]:focus {
   background-color: #eeeeec;
 }
@@ -109,4 +113,18 @@ code {
 /* Tables */
 td {
   border-bottom: 1px solid #eeeeec;
+}
+
+input[type="checkbox"]+label:before {
+  border-color: #babdb6;
+}
+
+input[type="checkbox"]:focus+label:before {
+  border-color: #eeeeec;
+}
+
+input[type="checkbox"]:checked+label:before {
+  border-color: #d3d7cf;
+  border-top-color: transparent;
+  border-left-color: transparent;
 }

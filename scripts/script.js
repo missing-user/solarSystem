@@ -1,7 +1,7 @@
 var canvas = document.getElementById("canvas"),
 	ctx = canvas.getContext("2d");
 // Set initial step size.
-var dt = 1e-1,
+var dt = 1e4,
 	adjusted_dt = [];
 // Set minimal step size.
 var dx_min = 1e3;
@@ -20,6 +20,7 @@ var origin = {
 	y: 0,
 	planet_scale: 500
 };
+var selected = {};
 
 function getGravAcc(pos, p1) {
 	// NOTE: P1 is the planet being accelerated, ignores itself
@@ -94,6 +95,7 @@ function adjustTimestep() {
 var sun = new Planet();
 sun.m = 1.989e30;
 sun.r = 19911000;
+sun.alt_r = 25;
 //sun.r = 696340000;
 sun.color = "yellow";
 sun.name = "sun";
@@ -106,7 +108,8 @@ planets.push(
 		3.302e23,
 		2439700,
 		"mercury ",
-		"gray"
+		"gray",
+		4
 	)
 );
 planets.push(
@@ -116,7 +119,8 @@ planets.push(
 		48.685e23,
 		6051800,
 		"venus",
-		"violet"
+		"violet",
+		7
 	)
 );
 planets.push(
@@ -130,7 +134,8 @@ planets.push(
 		5.97219e24,
 		6371000,
 		"earth",
-		"blue"
+		"blue",
+		11
 	)
 );
 planets.push(
@@ -140,7 +145,8 @@ planets.push(
 		6.4171e23,
 		3389000,
 		"mars",
-		"red"
+		"red",
+		9
 	)
 );
 planets.push(
@@ -150,7 +156,8 @@ planets.push(
 		1898.13e24,
 		69911000,
 		"jupiter",
-		"orange"
+		"orange",
+		18
 	)
 );
 planets.push(
@@ -160,7 +167,8 @@ planets.push(
 		5.6834e26,
 		58232000,
 		"saturn",
-		"brown"
+		"brown",
+		15
 	)
 );
 planets.push(
@@ -170,7 +178,8 @@ planets.push(
 		86.813e24,
 		25362000,
 		"uranus",
-		"lightblue"
+		"lightblue",
+		11
 	)
 );
 for (var p of planets) {
@@ -192,15 +201,8 @@ setInterval(function() {
 		for (var p of planets) {
 			adaptive_rk4_v2(p, dt);
 		}
-		adjustTimestep();
-	}
-	//draw all the planets
-	for (var p of planets) {
-		if (p.p.x > max_x) max_x = p.p.x;
-		if (p.p.y > max_y) max_y = p.p.y;
-		if (p.p.x < min_x) min_x = p.p.x;
-		if (p.p.y < min_y) min_y = p.p.y;
-		drawPlanet(p, p.r, p.color);
+		if (document.getElementById("box-0").checked) adjustTimestep();
+		else dt = dx_min * 5;
 	}
 	//scale the viewport to fit all planets
 	/*origin.scale = Math.min(
@@ -215,19 +217,38 @@ setInterval(function() {
 	);*/
 	origin.x = 500 / origin.scale;
 	origin.y = 500 / origin.scale;
+	//draw all the planets
+	for (var p of planets) {
+		if (p.p.x > max_x) max_x = p.p.x;
+		if (p.p.y > max_y) max_y = p.p.y;
+		if (p.p.x < min_x) min_x = p.p.x;
+		if (p.p.y < min_y) min_y = p.p.y;
+		drawPlanet(p, p.r, p.color);
+	}
+
 	ctx.fillStyle = "#fff";
-	ctx.clearRect(0, 0, 200, 40);
-	ctx.fillText(origin.scale, 10, 10);
-	ctx.fillText(origin.x, 10, 20);
-	ctx.fillText(origin.y, 10, 30);
+	ctx.font = "18px sans-serif";
+	if (selected.name) {
+		ctx.fillText(selected.name + "", 10, 20);
+		ctx.fillText(selected.m + " kg", 10, 40);
+		ctx.fillText(
+			Math.round(selected.p.length / 1000) + " km (distance from sun)",
+			10,
+			60
+		);
+		ctx.fillText(~~selected.v.length + " m/s", 10, 80);
+	}
 }, 7);
 
 function drawPlanet(p, radius, color) {
 	ctx.beginPath();
+	let raaaa = document.getElementById("box-1").checked
+		? radius * origin.planet_scale * origin.scale
+		: p.alt_r;
 	ctx.arc(
 		(p.p.x + origin.x) * origin.scale,
 		(p.p.y + origin.y) * origin.scale,
-		radius * origin.planet_scale * origin.scale,
+		raaaa,
 		0,
 		Math.PI * 2,
 		false
@@ -236,3 +257,30 @@ function drawPlanet(p, radius, color) {
 	ctx.fill();
 	ctx.stroke();
 }
+
+canvas.addEventListener(
+	"mousedown",
+	function(event) {
+		let rect = canvas.getBoundingClientRect();
+		console.log(rect);
+		let x = event.clientX - rect.left;
+		x *= canvas.width / rect.width;
+		let y = event.clientY - rect.top;
+		y *= canvas.height / rect.height;
+		console.log(event);
+
+		let minDist = Infinity;
+		for (var p of planets) {
+			let distFromClick =
+				(x - (p.p.x + origin.x) * origin.scale) *
+					(x - (p.p.x + origin.x) * origin.scale) +
+				(y - (p.p.y + origin.y) * origin.scale) *
+					(y - (p.p.y + origin.y) * origin.scale);
+			if (distFromClick < minDist) {
+				minDist = distFromClick;
+				selected = p;
+			}
+		}
+	},
+	false
+);

@@ -9,8 +9,8 @@
     <!-- CSS––––––––––––––––––––––– -->
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/skeleton.css">
-    <link rel="stylesheet" href="css/darkskelleton.css" media="(prefers-color-scheme: dark)">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/darkskelleton.css" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/png" href="images/favicon.png">
   </head>
   <body>
@@ -44,6 +44,25 @@
           <input type="range" value="1.3889477023997076e-10" min="1.3889477023997076e-10" max="1e-8" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; origin.scale = this.value" id="pixelsPerCell">
           <label for="pixelsPerCell">zoom</label>
           <output id="pixelsPerCello" class="u-pull-right">10</output>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="one-half column">
+          <input type="checkbox" id="box-1">
+          <label for="box-1">real planet sizes</label>
+        </div>
+        <div class="one-half column">
+          <input type="checkbox" id="box-0">
+          <label for="box-0">adaptive timestep</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="one-half column">
+          <h4>selected planets mass</h4>
+          <button type="button" name="button" onclick="selected.m*=10">increase</button>
+          <button type="button" name="button" onclick="selected.m/=10">decrease</button>
         </div>
       </div>
 

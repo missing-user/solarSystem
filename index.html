@@ -36,7 +36,10 @@
       <input type="range" value="1e3" min="1e2" max="1e4" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; dt = this.value" id="pixelsPerCell">
       <label style="color:white;font-size: large;" for="pixelsPerCell">timescale</label>
       <output style="color:white;font-size: large;" id="pixelsPerCello" class="u-pull-right">10</output>
-
+      <br>
+      <button type="button" name="button" onclick="if('image' in scene.background){
+	scene.background = new THREE.Color(0.7, 0.7, 0.7);}else{
+    scene.background = cubetex}">change background</button>
     </div>
     <div id="tooltip" style="background-color: black;color:white;position:absolute;font-size: large;"></div>
     <script type="text/javascript" src="simulation.js"></script>

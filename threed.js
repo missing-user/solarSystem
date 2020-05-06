@@ -1,5 +1,5 @@
 var scene = new THREE.Scene();
-
+var cubetex;
 //add camera and renderer
 var camera = new THREE.PerspectiveCamera(
 	45,
@@ -97,7 +97,7 @@ function loadScene() {
 	light.distance = 500;
 	//scene.add(light);
 
-	scene.background = new THREE.CubeTextureLoader()
+	cubetex = new THREE.CubeTextureLoader()
 		.setPath("skybox/")
 		.load([
 			"right.png",
@@ -107,6 +107,7 @@ function loadScene() {
 			"front.png",
 			"back.png"
 		]);
+	scene.background = cubetex;
 
 	var loader = new THREE.ObjectLoader();
 

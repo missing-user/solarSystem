@@ -6,4 +6,5 @@ function Planet(pos, vel, mass, rad, name, color, alt_r) {
 	this.m = mass || 1;
 	this.name = name;
 	this.color = color;
+	this.obj = [];
 }

@@ -1,7 +1,4 @@
-var canvas = document.getElementById("canvas"),
-	ctx = canvas.getContext("2d");
-// Set initial step size.
-var dt = 1e4,
+var dt = 1e3,
 	adjusted_dt = [];
 // Set minimal step size.
 var dx_min = 1e3;
@@ -18,19 +15,9 @@ var origin = {
 	scale: 1.3889477023997076e-10,
 	x: 0,
 	y: 0,
-	planet_scale: 500
+	planet_scale: 1
 };
-var selected = {},
-	maincolor = "#333";
-//set the colorscheme
-if (window.matchMedia) {
-	window.matchMedia("(prefers-color-scheme: dark)").addListener(e => {
-		maincolor = e.matches ? "#d3d7cf" : "#333";
-		console.log("theme change detected, setting color to", maincolor);
-	});
-	if (window.matchMedia("(prefers-color-scheme: dark)").matches)
-		maincolor = "#d3d7cf";
-}
+var selected = {};
 
 function getGravAcc(pos, p1) {
 	// NOTE: P1 is the planet being accelerated, ignores itself
@@ -105,7 +92,7 @@ function adjustTimestep() {
 var sun = new Planet();
 sun.m = 1.989e30;
 sun.r = 696340000;
-sun.alt_r = 25;
+sun.alt_r = 5;
 sun.color = "yellow";
 sun.name = "sun";
 planets.push(sun);
@@ -118,7 +105,7 @@ planets.push(
 		2439700,
 		"mercury ",
 		"gray",
-		4
+		0.5
 	)
 );
 planets.push(
@@ -129,7 +116,7 @@ planets.push(
 		6051800,
 		"venus",
 		"violet",
-		7
+		0.9
 	)
 );
 planets.push(
@@ -144,7 +131,7 @@ planets.push(
 		6371000,
 		"earth",
 		"blue",
-		11
+		2
 	)
 );
 planets.push(
@@ -155,7 +142,7 @@ planets.push(
 		3389000,
 		"mars",
 		"red",
-		9
+		1.5
 	)
 );
 planets.push(
@@ -166,7 +153,7 @@ planets.push(
 		69911000,
 		"jupiter",
 		"orange",
-		18
+		4
 	)
 );
 planets.push(
@@ -177,7 +164,7 @@ planets.push(
 		58232000,
 		"saturn",
 		"brown",
-		15
+		3
 	)
 );
 planets.push(
@@ -188,7 +175,18 @@ planets.push(
 		25362000,
 		"uranus",
 		"lightblue",
-		11
+		2.7
+	)
+);
+planets.push(
+	new Planet(
+		new Vector(4.385855652863605e9, -8.980490272512759e8, -8.259588661683089e7),
+		new Vector(1.066870300523487, 5.362051144679741, -1.353015879980848e-1),
+		102.413e24,
+		24766000,
+		"neptune",
+		"blue",
+		2.4
 	)
 );
 for (var p of planets) {
@@ -197,99 +195,19 @@ for (var p of planets) {
 	p.p = p.p.multiply(1000);
 }
 
-setInterval(function() {
-	//ctx.fillStyle = "rgba(0,0,0,0.05)";
-	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+function updateSimulation() {
 	let max_x = -Infinity,
 		max_y = -Infinity,
 		min_x = Infinity,
 		min_y = Infinity;
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	for (var i = 0; i < 20; i++) {
 		// NOTE: the step size has to stay the same for the entire calculation
 		for (var p of planets) {
 			adaptive_rk4_v2(p, dt);
 		}
-		if (document.getElementById("box-0").checked) adjustTimestep();
-		else dt = dx_min * 5;
+		//   adjustTimestep()
 	}
-	//scale the viewport to fit all planets
-	/*origin.scale = Math.min(
-		4e2 /
-			Math.max(
-				Math.abs(max_x),
-				Math.abs(min_y),
-				Math.abs(min_x),
-				Math.abs(max_y)
-			),
-		origin.scale
-	);*/
-	origin.x = 500 / origin.scale;
-	origin.y = 500 / origin.scale;
-	//draw all the planets
-	for (var p of planets) {
-		if (p.p.x > max_x) max_x = p.p.x;
-		if (p.p.y > max_y) max_y = p.p.y;
-		if (p.p.x < min_x) min_x = p.p.x;
-		if (p.p.y < min_y) min_y = p.p.y;
-		drawPlanet(p, p.r, p.color);
-	}
-
-	ctx.fillStyle = maincolor;
-	ctx.font = "16px sans-serif";
-	if (selected.name) {
-		ctx.fillText(selected.name + "", 10, 20);
-		ctx.fillText(selected.m + " kg", 10, 40);
-		ctx.fillText(
-			Math.round(selected.p.length / 1000) + " km (distance from sun)",
-			10,
-			60
-		);
-		ctx.fillText(~~selected.v.length + " m/s", 10, 80);
-	}
-}, 7);
-
-function drawPlanet(p, radius, color) {
-	ctx.beginPath();
-	let raaaa = document.getElementById("box-1").checked
-		? radius * origin.planet_scale * origin.scale
-		: p.alt_r;
-	ctx.arc(
-		(p.p.x + origin.x) * origin.scale,
-		(p.p.y + origin.y) * origin.scale,
-		raaaa,
-		0,
-		Math.PI * 2,
-		false
-	);
-	ctx.fillStyle = color;
-	ctx.fill();
-	ctx.stroke();
+	//replace 0 with whatever offset the origin has
+	origin.x = 0 / origin.scale;
+	origin.y = 0 / origin.scale;
 }
-
-canvas.addEventListener(
-	"mousedown",
-	function(event) {
-		let rect = canvas.getBoundingClientRect();
-		console.log(rect);
-		let x = event.clientX - rect.left;
-		x *= canvas.width / rect.width;
-		let y = event.clientY - rect.top;
-		y *= canvas.height / rect.height;
-		console.log(event);
-
-		let minDist = Infinity;
-		for (var p of planets) {
-			let distFromClick =
-				(x - (p.p.x + origin.x) * origin.scale) *
-					(x - (p.p.x + origin.x) * origin.scale) +
-				(y - (p.p.y + origin.y) * origin.scale) *
-					(y - (p.p.y + origin.y) * origin.scale);
-			if (distFromClick < minDist) {
-				minDist = distFromClick;
-				selected = p;
-			}
-		}
-	},
-	false
-);

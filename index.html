@@ -2,75 +2,44 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>solar system</title>
     <!-- MOBILE––––––––––––––––––––––– -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- CSS––––––––––––––––––––––– -->
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/skeleton.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/darkskelleton.css" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script type="text/javascript" src="planet.js"></script>
+    <script type="text/javascript" src="vector.js"></script>
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="column" style="margin-top: 5rem">
-          <h4>Solar System simulation</h4>
-          <p>It keeps slowing down and speeding up because I'm adjusting the simulation timestep dynamically, depending on how much accuracy is required. The solver is a
-            <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">Runge Kutta fourth order implementation</a>
-            (with custom adaptive timesteps)
-            <br>
-            The size of the planets depends on their Z position (how close they are to the camera), because the entire simulation is running in 3D but I didn't habe the time to make a proper 3D display yet. :D
-
-          </p>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="column">
-          <canvas class="u-full-width" id="canvas" width="1000" height="1000"></canvas>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="one-half column">
-          <input type="range" value="50" min="1" max="10000" step="any" oninput="document.getElementById('chargeIntensityo').value = this.value; origin.planet_scale = this.value" id="chargeIntensity">
-          <label for="chargeIntensity">planet scale</label>
-          <output id="chargeIntensityo" class="u-pull-right">1</output>
-        </div>
-        <div class="one-half column">
-          <input type="range" value="1.3889477023997076e-10" min="1.3889477023997076e-10" max="1e-8" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; origin.scale = this.value" id="pixelsPerCell">
-          <label for="pixelsPerCell">zoom</label>
-          <output id="pixelsPerCello" class="u-pull-right">10</output>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="one-half column">
-          <input type="checkbox" id="box-1">
-          <label for="box-1">real planet sizes</label>
-        </div>
-        <div class="one-half column">
-          <input type="checkbox" id="box-0">
-          <label for="box-0">adaptive timestep</label>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="one-half column">
-          <h4>selected planets mass</h4>
-          <button type="button" name="button" onclick="selected.m*=10; selected.r*=1.2; selected.alt_r*=1.2">increase</button>
-          <button type="button" name="button" onclick="selected.m/=10; selected.r/=1.2; selected.alt_r/=1.2">decrease</button>
-        </div>
-      </div>
+    <style>
+      body {
+        background-color: #000;
+        margin: 0;
+        overflow: hidden;
+        font-size: 1.5em;
+        /* currently ems cause chrome bug misinterpreting rems on body element */
+        line-height: 1.6;
+        font-weight: 400;
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #222;
+      }
+    </style>
+    <div style="position:absolute;">
+      <input type="range" value="1" min="1" max="10" step="any" oninput="document.getElementById('planetscaler').value = this.value; origin.planet_scale = this.value" id="planetscaler">
+      <label style="color:white;font-size: large;" for="planetscaler">planet scale</label>
+      <output style="color:white;font-size: large;" id="planetscaler" class="u-pull-right">10</output>
+      <br>
+      <input type="range" value="1e3" min="1e2" max="1e4" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; dt = this.value" id="pixelsPerCell">
+      <label style="color:white;font-size: large;" for="pixelsPerCell">timescale</label>
+      <output style="color:white;font-size: large;" id="pixelsPerCello" class="u-pull-right">10</output>
 
     </div>
-  </div>
-</div>
-<script type="text/javascript" src="scripts/vector.js"></script>
-<script type="text/javascript" src="scripts/planet.js"></script>
-<script type="text/javascript" src="scripts/script.js"></script>
-</body>
+    <div id="tooltip" style="background-color: black;color:white;position:absolute;font-size: large;"></div>
+    <script type="text/javascript" src="simulation.js"></script>
+    <script type="text/javascript" src="threed.js"></script>
+  </body>
 </html>

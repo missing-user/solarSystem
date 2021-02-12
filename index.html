@@ -1,61 +1,66 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-179475953-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
 
-      gtag('config', 'UA-179475953-1');
-    </script>
-    <meta charset="utf-8">
-    <title>solar system</title>
-    <!-- MOBILE––––––––––––––––––––––– -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- CSS––––––––––––––––––––––– -->
-    <link rel="icon" type="image/png" href="images/favicon.png">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-179475953-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
 
-    <script src="js/three.min.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script type="text/javascript" src="planet.js"></script>
-    <script type="text/javascript" src="vector.js"></script>
-  </head>
-  <body>
-    <style>
-      body {
-        background-color: #000;
-        margin: 0;
-        overflow: hidden;
-        font-size: 1.5em;
-        /* currently ems cause chrome bug misinterpreting rems on body element */
-        line-height: 1.6;
-        font-weight: 400;
-        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #222;
-      }
-    </style>
-    <div style="position:absolute;">
-      <input type="range" value="1" min="1" max="10" step="any" oninput="document.getElementById('planetscaler').value = this.value; origin.planet_scale = this.value" id="planetscaler">
-      <label style="color:white;font-size: large;" for="planetscaler">planet scale</label>
-      <output style="color:white;font-size: large;" id="planetscaler" class="u-pull-right">10</output>
-      <br>
-      <input type="range" value="1e3" min="1e2" max="1e4" step="any" oninput="document.getElementById('pixelsPerCello').value = this.value; dt = this.value" id="pixelsPerCell">
-      <label style="color:white;font-size: large;" for="pixelsPerCell">timescale</label>
-      <output style="color:white;font-size: large;" id="pixelsPerCello" class="u-pull-right">10</output>
-      <br>
-      <button type="button" name="button" onclick="if('image' in scene.background){
+    gtag('config', 'UA-179475953-1');
+  </script>
+  <meta charset="utf-8">
+  <title>solar system</title>
+  <!-- MOBILE––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- CSS––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <script src="js/three.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script type="text/javascript" src="planet.js"></script>
+  <script type="text/javascript" src="vector.js"></script>
+</head>
+
+<body>
+  <style>
+    body {
+      background-color: #000;
+      margin: 0;
+      overflow: hidden;
+      font-size: 1.5em;
+      /* currently ems cause chrome bug misinterpreting rems on body element */
+      line-height: 1.6;
+      font-weight: 400;
+      font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #222;
+    }
+  </style>
+  <div style="position:absolute;">
+    <input type="range" value="1" min="1" max="10" step="any"
+      oninput="document.getElementById('planetscaler').value = this.value; origin.planet_scale = this.value"
+      id="planetscaler">
+    <label style="color:white;font-size: large;" for="planetscaler">planet scale</label>
+    <output style="color:white;font-size: large;" id="planetscaler" class="u-pull-right">10</output>
+    <br>
+    <input type="range" value="1e3" min="1e2" max="1e4" step="any"
+      oninput="document.getElementById('pixelsPerCello').value = this.value; dt = this.value" id="pixelsPerCell">
+    <label style="color:white;font-size: large;" for="pixelsPerCell">timescale</label>
+    <output style="color:white;font-size: large;" id="pixelsPerCello" class="u-pull-right">10</output>
+    <br>
+    <button type="button" name="button" onclick="if('image' in scene.background){
 	scene.background = new THREE.Color(0.7, 0.7, 0.7);}else{
     scene.background = cubetex}">change background</button>
-    </div>
-    <div id="tooltip" style="background-color: black;color:white;position:absolute;font-size: large;"></div>
-    <script type="text/javascript" src="simulation.js"></script>
-    <script type="text/javascript" src="threed.js"></script>
-  </body>
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
-    data-cf-beacon='{"token": "f9f51233f11041a194c4d5f4511d8282"}'></script>
+  </div>
+  <div id="tooltip" style="background-color: black;color:white;position:absolute;font-size: large;"></div>
+  <script type="text/javascript" src="simulation.js"></script>
+  <script type="text/javascript" src="threed.js"></script>
+</body>
+<script>var cfla = document.createElement('script'); cfla.defer = true; cfla.src = 'https://static.cloudflareinsights.com/beacon.min.js'; cfla.setAttribute("data-cf-beacon", '{"token": "f9f51233f11041a194c4d5f4511d8282"}'); if (!window.localStorage || !window.localStorage.getItem("devmode")) document.body.appendChild(cfla)</script>
+
 </html>
